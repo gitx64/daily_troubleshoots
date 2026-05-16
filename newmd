@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+if [ -n "$1" ]; then
+	if [ -f $(date +%d-%m-%Y):"$1".md ]; then
+		echo "File already exists"
+		exit 1
+	else
+		touch $(date +%d-%m-%Y):"$1".md
+	fi
+	exit 0
+else
+	exit 1
+fi	
