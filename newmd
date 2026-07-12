@@ -1,13 +1,32 @@
 #!/usr/bin/env bash
 
-if [ -n "$1" ]; then
-	if [ -f $(date +%d-%m-%Y):"$1".md ]; then
-		echo "File already exists"
-		exit 1
-	else
-		touch $(date +%d-%m-%Y):"$1".md
-	fi
-	exit 0
+set -e
+
+create(){
+	touch "$1":"$(date +%d-%m-%Y)".md 
+}
+
+if [ -z "$1" ]; then
+	echo "Please enter your topic name: "
+	read -r topic
 else
-	exit 1
+	topic="$1"
 fi	
+
+file_exists=false
+
+for file in *"$topic".md; do
+	if [ -f "$file" ]; then
+		file_exists=true
+		break;	
+	fi
+done
+
+if [ "$file_exists" == true ]; then
+	echo "Topic file already exists"
+	exit 1
+else
+	create "$topic"
+	exit 0
+fi
+
