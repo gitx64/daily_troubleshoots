@@ -3,30 +3,75 @@
 set -e
 
 create(){
-	touch "$1":"$(date +%d-%m-%Y)".md 
+	local file
+	local topic
+	local date
+	local os
+
+	topic="$(echo "$1" | awk -F: '{print $1}')"
+	date="$(date +%d-%m-%Y)"
+	file="${topic}:${date}.md"
+	status="$(echo "$1" | awk -F: '{print $2}')" && [ -n "$status" ] || { echo "Input correctly" >&2; exit 1; }
+	os="$(cat /etc/os-release | grep -i name | awk -F= 'NR==1 {print $2}')"
+	touch "$file"
+	cat > "$file" <<- EOF
+# ${topic}
+**Date:** ${date}
+**System:** ${os}
+**Status:** ${status}
+
+---
+	
+## Problem
+<!-- What happened? What isn't working? -->
+	
+	
+
+## Investigation
+<!-- Commands executed and what their output revealed. -->
+	
+	
+	
+## Attempts
+<!-- What did you try? What happened after each attempt? -->
+	
+	
+	
+## Solution
+<!-- What fixed the issue? Leave pending if unresolved. -->
+	
+	
+	
+	## What I Learned
+	<!-- What Linux concept or diagnostic technique did I learn? -->
+	
+	
+	
+	## Next Time
+	<!-- What would I check first if this happened again? -->
+	
+	
+	
+	EOF
 }
 
-if [ -z "$1" ]; then
-	echo "Please enter your topic name: "
-	read -r topic
+if [ -z "${1:-}" ]; then
+    read -r -p "Please enter your topic name: " topic
 else
-	topic="$1"
-fi	
-
-file_exists=false
-
-for file in *"$topic".md; do
-	if [ -f "$file" ]; then
-		file_exists=true
-		break;	
-	fi
-done
-
-if [ "$file_exists" == true ]; then
-	echo "Topic file already exists"
-	exit 1
-else
-	create "$topic"
-	exit 0
+    topic="$1"
 fi
 
+if [ -z "$topic" ]; then
+    echo "Topic name cannot be empty."
+    exit 1
+fi
+
+date="$(date +%d-%m-%Y)"
+file="${topic}:${date}.md"
+
+if [ -e "$file" ]; then
+    echo "Topic file already exists: $file"
+    exit 1
+else
+    create "$topic"
+fi
